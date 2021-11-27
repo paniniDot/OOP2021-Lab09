@@ -24,6 +24,13 @@ public class Counter {
     }
 
     /**
+     * Decrement the current value.
+     */
+    public void decrement() {
+        this.current--;
+    }
+
+    /**
      *
      * @return the current value.
      */
