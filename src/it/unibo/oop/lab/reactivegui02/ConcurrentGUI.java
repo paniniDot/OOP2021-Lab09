@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -23,7 +24,7 @@ public class ConcurrentGUI extends JFrame {
     private final JButton up;
     private final JButton down;
     private final JButton stop;
-    private final JTextField counter;
+    private final JLabel counter;
 
     /**
      * Builds a new GUI.
@@ -38,9 +39,8 @@ public class ConcurrentGUI extends JFrame {
         this.up = new JButton("up");
         this.down = new JButton("down");
         this.stop = new JButton("stop");
-        this.counter = new JTextField("0");
+        this.counter = new JLabel("0");
         this.counter.setSize(this.up.getPreferredSize());
-        this.counter.setEditable(false);
         display.add(counter);
         display.add(up);
         display.add(down);
