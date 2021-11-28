@@ -19,6 +19,9 @@ public class MultiThreadedSumMatrix implements SumMatrix {
      *              no. of Threads performing the sum.
      */
     public MultiThreadedSumMatrix(final int nThreads) {
+        if (nThreads < 1) {
+            throw new IllegalArgumentException();
+        }
         this.nThreads = nThreads;
     }
 
@@ -63,7 +66,7 @@ public class MultiThreadedSumMatrix implements SumMatrix {
 
         /**
          * @param matrix
-         *          the list in which workers have to perform a sum.
+         *          the matrix to be summed.
          * @param startPos
          *          the start index for this worker.
          * @param length
@@ -84,7 +87,7 @@ public class MultiThreadedSumMatrix implements SumMatrix {
         public void run() {
             System.out.println("Working from position " + this.startPos + " to position " + (this.startPos + this.length - 1));
             for (int i = this.startPos; i < matrix.length && i < this.startPos + this.length; i++) {
-                for (final var num: matrix[i]) {
+                for (final var num: this.matrix[i]) {
                     this.sum += num;
                 }
             }
