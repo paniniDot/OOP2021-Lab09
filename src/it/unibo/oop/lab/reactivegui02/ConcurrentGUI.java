@@ -20,7 +20,6 @@ public class ConcurrentGUI extends JFrame {
     private static final long serialVersionUID = 1L;
     private static final double WIDTH_PERC = 0.2;
     private static final double HEIGHT_PERC = 0.1;
-    private final JPanel display;
     private final JButton up;
     private final JButton down;
     private final JButton stop;
@@ -34,12 +33,25 @@ public class ConcurrentGUI extends JFrame {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         this.setSize((int) (screenSize.getWidth() * WIDTH_PERC), (int) (screenSize.getHeight() * HEIGHT_PERC));
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        final JPanel display = new JPanel();
         final Agent ag = new Agent();
         this.up = new JButton("up");
         this.down = new JButton("down");
         this.stop = new JButton("stop");
+        this.counter = new JTextField("0");
+        this.counter.setSize(this.up.getPreferredSize());
+        this.counter.setEditable(false);
+        display.add(counter);
+        display.add(up);
+        display.add(down);
+        display.add(stop);
+        this.getContentPane().add(display);
+        this.setVisible(true);
 
         this.up.addActionListener(e -> {
+            if (!ag.isOn()) {
+                ag.start();
+            }
             ag.setUp();
             this.up.setEnabled(false);
             this.down.setEnabled(true);
@@ -47,6 +59,9 @@ public class ConcurrentGUI extends JFrame {
         });
 
         this.down.addActionListener(e -> {
+            if (!ag.isOn()) {
+                ag.start();
+            }
             ag.setDown();
             this.up.setEnabled(true);
             this.down.setEnabled(false);
@@ -59,16 +74,6 @@ public class ConcurrentGUI extends JFrame {
             this.down.setEnabled(false);
             this.stop.setEnabled(false);
         });
-        ag.start();
-        this.counter = new JTextField("0");
-        this.counter.setEditable(false);
-        this.display = new JPanel();
-        this.display.add(counter);
-        this.display.add(up);
-        this.display.add(down);
-        this.display.add(stop);
-        this.getContentPane().add(this.display);
-        this.setVisible(true);
     }
 
     /**
@@ -80,7 +85,8 @@ public class ConcurrentGUI extends JFrame {
 
         private volatile boolean stop;
         private volatile boolean isIncrement;
-        private volatile Counter counter;
+        private volatile boolean isOn;
+        private final Counter counter;
 
         /**
          * Constructor.
@@ -88,13 +94,15 @@ public class ConcurrentGUI extends JFrame {
         Agent() {
             this.stop = false;
             this.isIncrement = true;
+            this.isOn = false;
             this.counter = new Counter();
         }
         /**
          * Core method.
          */
         @Override
-        public synchronized void run() {
+        public void run() {
+            this.isOn = true;
             while (!this.stop) {
                 try {
                     if (this.isIncrement) {
@@ -112,21 +120,28 @@ public class ConcurrentGUI extends JFrame {
         /**
          *  Sets the counter to increment. 
          */
-        public synchronized void setUp() {
+        public void setUp() {
             this.isIncrement = true;
         }
         /**
          *  Sets the counter to decrement. 
          */
-        public synchronized void setDown() {
+        public void setDown() {
             this.isIncrement = false;
         }
         /**
          * It stops the counter.
          */
-        public synchronized void stopCounting() {
+        public void stopCounting() {
             this.stop = true;
-            this.interrupt();
+        }
+        /**
+         * It allows to understand if the thread already started.
+         * 
+         *  @return true if the thread is already active, false otherwise.
+         */
+        public boolean isOn() {
+            return this.isOn;
         }
     }
 }
